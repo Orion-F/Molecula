@@ -6,7 +6,7 @@ import javafx.stage.Stage;
 import chem.Atom;
 import chem.AtomData;
 
-public class Start extends Application {
+public class MoleculaStart extends Application {
 
     public static void main(String[] args) {
         AtomData.initData();

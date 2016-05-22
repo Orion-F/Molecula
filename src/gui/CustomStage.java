@@ -2,7 +2,7 @@ package gui;
 
 import java.util.Optional;
 
-import img.LoadedImages;
+import img.SafeImage;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -56,7 +56,7 @@ public class CustomStage extends Stage {
         HBox.setHgrow(titleBuffer, Priority.ALWAYS);
         
         minimizeButton = new Button();
-        minimizeButton.setGraphic(new ImageView(LoadedImages.MINIMIZE_ICON));
+        minimizeButton.setGraphic(new ImageView(new SafeImage("/img/minimizeIcon.png").getImage()));
         minimizeButton.setPrefHeight(titleButtonHeight);
         minimizeButton.setMaxHeight(titleButtonHeight);
         minimizeButton.setMinHeight(titleButtonHeight);
@@ -68,7 +68,7 @@ public class CustomStage extends Stage {
         });
         
         closeButton = new Button();
-        closeButton.setGraphic(new ImageView(LoadedImages.CLOSE_ICON));
+        closeButton.setGraphic(new ImageView(new SafeImage("/img/closeIcon.png").getImage()));
         closeButton.setPrefHeight(titleButtonHeight);
         closeButton.setMaxHeight(titleButtonHeight);
         closeButton.setMinHeight(titleButtonHeight);
