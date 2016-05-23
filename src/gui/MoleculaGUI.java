@@ -1,5 +1,9 @@
 package gui;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -27,10 +31,9 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import run.UtilitoolsGUI;
 
 public class MoleculaGUI extends CustomStage {
-    
-    private final String VERSION = "1.0.0";
     
     private final int WIDTH = 1000;
     private final int HEIGHT = 750;
@@ -45,8 +48,8 @@ public class MoleculaGUI extends CustomStage {
     private TabPane infoPane;
     private MenuBar menuBar;
     private Menu menuFile, menuMolecule;
-    @SuppressWarnings("unused")
-	private MenuItem menuItemExit, menuItemFormula, menuItemManual, menuItemChangeMolecule;
+	@SuppressWarnings("unused")
+    private MenuItem menuItemExit, menuItemFormula, menuItemManual, menuItemChangeMolecule;
     private Group displayGroup, rootGroup;
     private SubScene subScene;
     private PerspectiveCamera camera;
@@ -59,7 +62,17 @@ public class MoleculaGUI extends CustomStage {
     private boolean moleculeDrawn;
     
     public MoleculaGUI() {
-        this.setCustomTitle("Molecula V" + VERSION);
+        InputStream versionStream = UtilitoolsGUI.class.getResourceAsStream("/main/VERSION.txt");
+        String version = "???";
+        if (versionStream != null) {
+            BufferedReader versionReader = new BufferedReader(new InputStreamReader(versionStream));
+            try {
+                version = versionReader.readLine();
+            } catch (IOException e) {
+                //Do nothing
+            }
+        }
+        this.setCustomTitle("Molecula V" + version);
         this.setResizable(false);
         this.setWidth(WIDTH);
         this.setHeight(HEIGHT);

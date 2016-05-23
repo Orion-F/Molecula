@@ -2,9 +2,9 @@ package chem;
 
 import javafx.scene.paint.Color;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class AtomData {
     
@@ -45,8 +45,8 @@ public class AtomData {
         if (data == null) {
             data = new Atom[NUMBER];
             try {
-                BufferedReader reader = new BufferedReader(new FileReader(
-                        AtomData.class.getResource("atoms.txt").getPath()));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(
+                        AtomData.class.getResourceAsStream("/chem/atoms.txt")));
                 for (int i = 0; i < NUMBER; i++) {
                     String[] dataLine = reader.readLine().split(" ");
                     data[i] = new Atom(Integer.parseInt(dataLine[0]),
@@ -63,8 +63,8 @@ public class AtomData {
         if (colorData == null) {
             colorData = new Color[NUMBER];
             try {
-                BufferedReader reader = new BufferedReader(new FileReader(
-                        AtomData.class.getResource("atomColor.txt").getPath()));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(
+                        AtomData.class.getResourceAsStream("/chem/atomColor.txt")));
                 for (int i = 0; i < NUMBER; i++) {
                     String[] dataLine = reader.readLine().split(" ");
                     String rgbRaw = dataLine[2];

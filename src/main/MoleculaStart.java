@@ -3,7 +3,6 @@ package main;
 import gui.MoleculaGUI;
 import javafx.application.Application;
 import javafx.stage.Stage;
-import chem.Atom;
 import chem.AtomData;
 
 public class MoleculaStart extends Application {
