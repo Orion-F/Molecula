@@ -32,6 +32,7 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import run.UtilitoolsGUI;
+import run.VersionReader;
 
 public class MoleculaGUI extends CustomStage {
     
@@ -48,7 +49,6 @@ public class MoleculaGUI extends CustomStage {
     private TabPane infoPane;
     private MenuBar menuBar;
     private Menu menuFile, menuMolecule;
-	@SuppressWarnings("unused")
     private MenuItem menuItemExit, menuItemFormula, menuItemManual, menuItemChangeMolecule;
     private Group displayGroup, rootGroup;
     private SubScene subScene;
@@ -62,17 +62,7 @@ public class MoleculaGUI extends CustomStage {
     private boolean moleculeDrawn;
     
     public MoleculaGUI() {
-        InputStream versionStream = UtilitoolsGUI.class.getResourceAsStream("/main/VERSION.txt");
-        String version = "???";
-        if (versionStream != null) {
-            BufferedReader versionReader = new BufferedReader(new InputStreamReader(versionStream));
-            try {
-                version = versionReader.readLine();
-            } catch (IOException e) {
-                //Do nothing
-            }
-        }
-        this.setCustomTitle("Molecula V" + version);
+        this.setCustomTitle("Molecula V" + VersionReader.get());
         this.setResizable(false);
         this.setWidth(WIDTH);
         this.setHeight(HEIGHT);
