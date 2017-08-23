@@ -1,25 +1,23 @@
 package gui;
 
-import java.util.ArrayList;
-import java.util.Optional;
-
 import chem.Atom;
 import chem.Molecule;
 import chem.Shape;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TabPane.TabClosingPolicy;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import main.VersionReader;
 
+import java.util.ArrayList;
+import java.util.Optional;
+
+@SuppressWarnings("FieldCanBeLocal")
 public class MoleculaGUI extends Stage {
 
     private final int WIDTH = 1000;
@@ -54,14 +52,9 @@ public class MoleculaGUI extends Stage {
         this.setWidth(WIDTH);
         this.setHeight(HEIGHT);
 
-        this.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent event) {
-                closeConfirmation(event);
-            }
-        });
+        this.setOnCloseRequest(this::closeConfirmation);
 
-        molecules = new ArrayList<Molecule>();
+        molecules = new ArrayList<>();
 
         basePane = new BorderPane();
 
@@ -71,20 +64,12 @@ public class MoleculaGUI extends Stage {
         menuFile = new Menu("File");
         menuMolecule = new Menu("Molecule");
         menuItemFormula = new MenuItem("Add Molecule Using Formula");
+        menuItemFormula.setOnAction(event -> addMoleculeByFormula());
         menuItemManual = new MenuItem("Add Molecule Manually");
-        menuItemManual.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent event) {
-                addMoleculeManually();
-            }
-        });
+        menuItemManual.setOnAction(event -> addMoleculeManually());
         menuItemChangeMolecule = new MenuItem("Change Molecule");
-        menuItemChangeMolecule.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent event) {
-                changeMolecule();
-            }
-        });
-//        menuMolecule.getItems().addAll(menuItemFormula, menuItemManual, menuItemChangeMolecule);
-        menuMolecule.getItems().addAll(menuItemManual, menuItemChangeMolecule);
+        menuItemChangeMolecule.setOnAction(event -> changeMolecule());
+        menuMolecule.getItems().addAll(menuItemFormula, menuItemManual, menuItemChangeMolecule);
 
         menuBar.getMenus().addAll(menuFile, menuMolecule);
 
@@ -111,12 +96,9 @@ public class MoleculaGUI extends Stage {
         subScene = new SubScene(rootGroup, DISPLAY_SUB_PANE_WIDTH,
                 DISPLAY_SUB_PANE_HEIGHT, true, SceneAntialiasing.BALANCED);
         subScene.setCamera(camera);
-        subScene.setOnScroll(new EventHandler<ScrollEvent>() {
-            @Override
-            public void handle(ScrollEvent event) {
-                cameraZoom += event.getDeltaY() * ZOOM_SPEED;
-                camera.setTranslateZ(cameraZoom);
-            }
+        subScene.setOnScroll(event -> {
+            cameraZoom += event.getDeltaY() * ZOOM_SPEED;
+            camera.setTranslateZ(cameraZoom);
         });
 
         displayGroup = new Group(subScene);
@@ -137,20 +119,25 @@ public class MoleculaGUI extends Stage {
         this.show();
     }
 
-    public void closeConfirmation(WindowEvent event) {
-        Alert closeAlert = new Alert(AlertType.CONFIRMATION);
-        closeAlert.setTitle("Confirm Close");
-        closeAlert.setHeaderText("Confirm Close");
-        closeAlert.setContentText("Are you sure that you would like to close Molecula?");
-        Optional<ButtonType> result = closeAlert.showAndWait();
-        if (result.get() == ButtonType.OK) {
-            this.close();
+    private void addMoleculeByFormula() {
+        String formula;
+
+        TextInputDialog centralDialog = new TextInputDialog();
+        centralDialog.setTitle("Add Molecule");
+        centralDialog.setHeaderText("Molecular Formula");
+        centralDialog.setContentText("Please enter the molecular formula of the molecule:");
+
+        Optional<String> result = centralDialog.showAndWait();
+        formula = result.orElse("");
+
+        if (!formula.equals("")) {
+            molecules.add(new Molecule(formula));
         } else {
-            event.consume();
+            showInvalidMoleculeAlert();
         }
     }
 
-    public void addMoleculeManually() {
+    private void addMoleculeManually() {
 //    	ArrayList<String> choices = new ArrayList<>();
 //    	Shape[] shapes = Shape.values();
 //    	for (int i = 0; i < shapes.length; i++) {
@@ -218,18 +205,13 @@ public class MoleculaGUI extends Stage {
         if (valid) {
             molecules.add(new Molecule(central, outers, lonePairs));
         } else {
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Invalid Molecule");
-            alert.setContentText("The molecule entered is invalid");
-
-            alert.showAndWait();
+            showInvalidMoleculeAlert();
         }
 
 
     }
 
-    public void changeMolecule() {
+    private void changeMolecule() {
         if (molecules.size() == 0) {
             Alert alert = new Alert(AlertType.WARNING);
             alert.setTitle("Warning");
@@ -239,8 +221,8 @@ public class MoleculaGUI extends Stage {
             alert.showAndWait();
         } else {
             ArrayList<String> choices = new ArrayList<>();
-            for (int i = 0; i < molecules.size(); i++) {
-                choices.add(molecules.get(i).getFormula());
+            for (Molecule molecule : molecules) {
+                choices.add(molecule.getFormula());
             }
 
             ChoiceDialog<String> dialog = new ChoiceDialog<>(choices.get(0), choices);
@@ -261,7 +243,7 @@ public class MoleculaGUI extends Stage {
         }
     }
 
-    public void refreshInfo() {
+    private void refreshInfo() {
         infoPane.getTabs().clear();
 
         Molecule molecule = molecules.get(curMoleculeNum);
@@ -291,7 +273,7 @@ public class MoleculaGUI extends Stage {
         cenBox.getChildren().addAll(new Label("Name: " + cen.getName()),
                 new Label("Mass: " + cen.getMass()),
                 new Label("Radius: " + cen.getRadius()),
-                new Label("# Valence: " + cen.getNumValence())
+                new Label("# Valence: " + cen.getValence())
         );
         atomTab.setContent(cenBox);
 
@@ -307,7 +289,7 @@ public class MoleculaGUI extends Stage {
             atomBox.getChildren().addAll(new Label("Name: " + atom.getName()),
                     new Label("Mass: " + atom.getMass()),
                     new Label("Radius: " + atom.getRadius()),
-                    new Label("# Valence: " + atom.getNumValence())
+                    new Label("# Valence: " + atom.getValence())
             );
             atomTabs[i].setContent(atomBox);
         }
@@ -315,10 +297,30 @@ public class MoleculaGUI extends Stage {
         Tab[] tabs = new Tab[2 + outers.length];
         tabs[0] = moleculeTab;
         tabs[1] = atomTab;
-        for (int i = 0; i < atomTabs.length; i++) {
-            tabs[i + 2] = atomTabs[i];
-        }
+        System.arraycopy(atomTabs, 0, tabs, 2, atomTabs.length);
 
         infoPane.getTabs().addAll(tabs);
+    }
+
+    private void closeConfirmation(WindowEvent event) {
+        Alert closeAlert = new Alert(AlertType.CONFIRMATION);
+        closeAlert.setTitle("Confirm Close");
+        closeAlert.setHeaderText("Confirm Close");
+        closeAlert.setContentText("Are you sure that you would like to close Molecula?");
+        Optional<ButtonType> result = closeAlert.showAndWait();
+        if (result.orElse(ButtonType.OK) == ButtonType.OK) {
+            this.close();
+        } else {
+            event.consume();
+        }
+    }
+
+    private void showInvalidMoleculeAlert() {
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Invalid Molecule");
+        alert.setContentText("The molecule entered is invalid");
+
+        alert.showAndWait();
     }
 }

@@ -20,13 +20,33 @@ public class Molecule {
     private Atom centralAtom;
     private Atom[] outerAtoms;
     
-//    public Molecule(String formula) {
-//        
-//    }
-//    
-//    public Molecule(String formula, Atom centralAtom) {
-//        
-//    }
+    public Molecule(String formula) {
+        ArrayList<Atom> tempOuterAtoms = new ArrayList<>();
+
+        int place = 2;
+        if (formula.length() > 1) {
+            centralAtom = AtomData.getAtomBySymbol(formula.substring(0, 2));
+        }
+        if (centralAtom == null) {
+            centralAtom = AtomData.getAtomBySymbol(formula.substring(0, 1));
+            place--;
+        }
+        while (place < formula.length()) {
+            Atom curAtom = null;
+            if (place < formula.length() - 1) {
+                curAtom = AtomData.getAtomBySymbol(formula.substring(place, place + 2));
+            }
+            if (curAtom == null) {
+                curAtom = AtomData.getAtomBySymbol(formula.substring(place, place + 1));
+                place++;
+            } else {
+                place += 1;
+            }
+            tempOuterAtoms.add(curAtom);
+        }
+        outerAtoms = tempOuterAtoms.toArray(new Atom[tempOuterAtoms.size()]);
+        shape = Shape.getShape(outerAtoms.length, (centralAtom.getValence() - outerAtoms.length)/2);
+    }
     
     public Molecule(Atom centralAtom) {
         shape = Shape.A;
@@ -49,7 +69,7 @@ public class Molecule {
     	ArrayList<Node> nodes = new ArrayList<Node>();
     	
     	Sphere central = new Sphere(centralAtom.getRadius());
-    	central.setMaterial(new PhongMaterial(centralAtom.getAtomColor()));
+    	central.setMaterial(new PhongMaterial(centralAtom.getAtomColorRepresentation()));
     	nodes.add(central);
     	
     	ArrayList<Atom> outer = new ArrayList<Atom>(Arrays.asList(outerAtoms));
@@ -58,7 +78,7 @@ public class Molecule {
     	Cylinder bond;
     	Color color;
     	if (shape != Shape.A && shape != Shape.AX4) {
-    	    color = outer.get(0).getAtomColor();
+    	    color = outer.get(0).getAtomColorRepresentation();
     	    radius = outer.remove(0).getRadius();
     	    trans = centralAtom.getRadius() + BL + radius;
             atom = new Sphere(radius);
@@ -72,7 +92,7 @@ public class Molecule {
     	} if (shape == Shape.AX2 || shape == Shape.AX5 || shape == Shape.AX4E1 
     	        || shape == Shape.AX3E2 || shape == Shape.AX2E3 || shape == Shape.AX6 
     	        || shape == Shape.AX5E1 || shape == Shape.AX4E2) {
-    	    color = outer.get(0).getAtomColor();
+    	    color = outer.get(0).getAtomColorRepresentation();
     	    radius = outer.remove(0).getRadius();
             trans = centralAtom.getRadius() + BL + radius;
             atom = new Sphere(radius);
@@ -84,7 +104,7 @@ public class Molecule {
             bond.setTranslateX(-trans/2);
             nodes.add(bond);
     	} if (shape == Shape.AX5 || shape == Shape.AX3E2 || shape == Shape.AX6 || shape == Shape.AX5E1) {
-    	    color = outer.get(0).getAtomColor();
+    	    color = outer.get(0).getAtomColorRepresentation();
     	    radius = outer.remove(0).getRadius();
             trans = centralAtom.getRadius() + BL + radius;
             atom = new Sphere(radius);
@@ -95,7 +115,7 @@ public class Molecule {
             bond.setTranslateY(-trans/2);
             nodes.add(bond);
     	} if (shape == Shape.AX6) {
-    	    color = outer.get(0).getAtomColor();
+    	    color = outer.get(0).getAtomColorRepresentation();
     	    radius = outer.remove(0).getRadius();
             trans = centralAtom.getRadius() + BL + radius;
             atom = new Sphere(radius);
@@ -106,7 +126,7 @@ public class Molecule {
             bond.setTranslateY(trans/2);
             nodes.add(bond);
     	} if (shape == Shape.AX6 || shape == Shape.AX5E1 || shape == Shape.AX4E2) {
-    	    color = outer.get(0).getAtomColor();
+    	    color = outer.get(0).getAtomColorRepresentation();
     	    radius = outer.remove(0).getRadius();
             trans = centralAtom.getRadius() + BL + radius;
             atom = new Sphere(radius);
@@ -119,7 +139,7 @@ public class Molecule {
             bond.setRotate(90);
             nodes.add(bond);
             
-            color = outer.get(0).getAtomColor();
+            color = outer.get(0).getAtomColorRepresentation();
             radius = outer.remove(0).getRadius();
             trans = centralAtom.getRadius() + BL + radius;
             atom = new Sphere(radius);
@@ -132,7 +152,7 @@ public class Molecule {
             bond.setRotate(90);
             nodes.add(bond);
     	} if (shape == Shape.AX5 || shape == Shape.AX4E1) {
-    	    color = outer.get(0).getAtomColor();
+    	    color = outer.get(0).getAtomColorRepresentation();
     	    radius = outer.remove(0).getRadius();
             trans = centralAtom.getRadius() + BL + radius;
             atom = new Sphere(radius);
@@ -147,7 +167,7 @@ public class Molecule {
             bond.setRotate(60);
             nodes.add(bond);
             
-            color = outer.get(0).getAtomColor();
+            color = outer.get(0).getAtomColorRepresentation();
             radius = outer.remove(0).getRadius();
             trans = centralAtom.getRadius() + BL + radius;
             atom = new Sphere(radius);
@@ -167,31 +187,31 @@ public class Molecule {
     	    trans = centralAtom.getRadius() + BL + radius;
     	    double scale = trans/Math.sqrt(3);
     	    
-    	    color = outer.get(0).getAtomColor();
+    	    color = outer.get(0).getAtomColorRepresentation();
             atom = new Sphere(radius);
             atom.setMaterial(new PhongMaterial(color));
             atom.getTransforms().add(new Translate(scale, scale, scale));
             nodes.add(atom);
             
-            color = outer.get(0).getAtomColor();
+            color = outer.get(0).getAtomColorRepresentation();
             atom = new Sphere(radius);
             atom.setMaterial(new PhongMaterial(color));
             atom.getTransforms().add(new Translate(-scale, -scale, scale));
             nodes.add(atom);
             
-            color = outer.get(0).getAtomColor();
+            color = outer.get(0).getAtomColorRepresentation();
             atom = new Sphere(radius);
             atom.setMaterial(new PhongMaterial(color));
             atom.getTransforms().add(new Translate(-scale, scale, -scale));
             nodes.add(atom);
             
-            color = outer.get(0).getAtomColor();
+            color = outer.get(0).getAtomColorRepresentation();
             atom = new Sphere(radius);
             atom.setMaterial(new PhongMaterial(color));
             atom.getTransforms().add(new Translate(scale, -scale, -scale));
             nodes.add(atom);
     	} if (shape == Shape.AX3) {
-    		color = outer.get(0).getAtomColor();
+    		color = outer.get(0).getAtomColorRepresentation();
     	    radius = outer.remove(0).getRadius();
             trans = centralAtom.getRadius() + BL + radius;
             atom = new Sphere(radius);
@@ -205,7 +225,7 @@ public class Molecule {
             bond.setRotate(30);
             nodes.add(bond);
             
-            color = outer.get(0).getAtomColor();
+            color = outer.get(0).getAtomColorRepresentation();
     	    radius = outer.remove(0).getRadius();
             trans = centralAtom.getRadius() + BL + radius;
             atom = new Sphere(radius);
@@ -219,7 +239,7 @@ public class Molecule {
             bond.setTranslateY(-trans/2);
             nodes.add(bond);
     	} if (shape == Shape.AX2E1) {
-    		color = outer.get(0).getAtomColor();
+    		color = outer.get(0).getAtomColorRepresentation();
     	    radius = outer.remove(0).getRadius();
             trans = centralAtom.getRadius() + BL + radius;
             atom = new Sphere(radius);
