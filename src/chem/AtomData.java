@@ -7,8 +7,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class AtomData {
+
+    //atoms.txt format: number,symbol,name,mass,radius,valence
     
-    private static final int NUMBER = 109;
+    private static final int NUMBER = 107;
 
     private static Atom[] data = null;
     private static Color[] colorData = null;
@@ -21,7 +23,7 @@ public class AtomData {
     
     public static Atom getAtomBySymbol(String symbol) {
         for (int i = 0; i < data.length; i++) {
-            if (data[i].getSymbol().equalsIgnoreCase(symbol)) {
+            if (data[i].getSymbol().equals(symbol)) {
                 return data[i];
             }
         }
@@ -37,7 +39,7 @@ public class AtomData {
         return null;
     }
     
-    public static Color getColor(int number) {
+    public static Color getColorRepresentation(int number) {
         return colorData[number - 1];
     }
     
@@ -48,11 +50,12 @@ public class AtomData {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(
                         AtomData.class.getResourceAsStream("/chem/atoms.txt")));
                 for (int i = 0; i < NUMBER; i++) {
-                    String[] dataLine = reader.readLine().split(" ");
+                    String[] dataLine = reader.readLine().split(",");
                     data[i] = new Atom(Integer.parseInt(dataLine[0]),
                             dataLine[1], dataLine[2], 
                             Double.parseDouble(dataLine[3]), 
-                            Double.parseDouble(dataLine[4]));
+                            Double.parseDouble(dataLine[4]),
+                            Integer.parseInt(dataLine[5]));
                 }
                 reader.close();
             } catch (IOException e) {
